@@ -9,7 +9,7 @@ from mario_grid_env import MarioGridEnv
 SEED = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 STEPS = int(sys.argv[2]) if len(sys.argv) > 2 else 200_000
 N_ENVS = 4
-RUN = f"runs/grid_seed{SEED}"
+RUN = f"runs/grid_seed{SEED}_{STEPS // 1000}k"
 
 def make_env(i):
     def thunk():
@@ -26,11 +26,11 @@ if __name__ == "__main__":
                 policy_kwargs=dict(net_arch=dict(pi=[128, 128], vf=[128, 128])),
                 seed=SEED, verbose=1)
     ckpt = CheckpointCallback(save_freq=50_000 // N_ENVS, save_path="models",
-                              name_prefix=f"grid_seed{SEED}")
+                              name_prefix=f"grid_seed{SEED}_{STEPS // 1000}k")
     t0 = time.time()
     model.learn(total_timesteps=STEPS, callback=ckpt, log_interval=50)
     print(f"training wall-clock: {time.time() - t0:.0f}s")
-    model.save(f"models/grid_seed{SEED}")
+    model.save(f"models/grid_seed{SEED}_{STEPS // 1000}k")
     venv.close()
 
     # one deterministic episode + inference latency (one observation at a time, like a live demo)
