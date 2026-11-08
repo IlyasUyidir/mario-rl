@@ -6,11 +6,13 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from mario_grid_env import MarioGridEnv
 from mario_kin_env import MarioKinEnv
+from mario_env import MarioEnv
 
 SEED = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 STEPS = int(sys.argv[2]) if len(sys.argv) > 2 else 200_000
 VARIANT = sys.argv[3] if len(sys.argv) > 3 else "grid"      # "grid" or "kin"
-ENV = {"grid": MarioGridEnv, "kin": MarioKinEnv}[VARIANT]
+ENV = {"grid": MarioGridEnv, "kin": MarioKinEnv, "pix": MarioEnv}[VARIANT]
+PIX = VARIANT == "pix"
 N_ENVS = 4
 NAME = f"{VARIANT}_seed{SEED}_{STEPS // 1000}k"
 RUN = f"runs/{NAME}"
@@ -24,9 +26,9 @@ if __name__ == "__main__":
     os.makedirs(RUN, exist_ok=True)
     os.makedirs("models", exist_ok=True)
     venv = SubprocVecEnv([make_env(i) for i in range(N_ENVS)])
-    model = PPO("MlpPolicy", venv, device="cpu", n_steps=128, batch_size=128,
+    model = PPO("CnnPolicy" if PIX else "MlpPolicy", venv, device="mps" if PIX else "cpu", n_steps=128, batch_size=128,
                 n_epochs=4, learning_rate=2.5e-4, clip_range=0.1, ent_coef=0.01,
-                policy_kwargs=dict(net_arch=dict(pi=[128, 128], vf=[128, 128])),
+                policy_kwargs=None if PIX else dict(net_arch=dict(pi=[128, 128], vf=[128, 128])),
                 seed=SEED, verbose=1)
     ckpt = CheckpointCallback(save_freq=50_000 // N_ENVS, save_path="models", name_prefix=NAME)
     t0 = time.time()

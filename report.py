@@ -43,7 +43,7 @@ for v, lst in runs.items():
           f"wall {ms([s['wall'] for s in S])}s")
 
 xs = np.arange(5, 100, 10)                                   # centre of each 10% chunk
-colors = {"grid": "tab:blue", "kin": "tab:red"}
+colors = {"grid": "tab:blue", "kin": "tab:red", "pix": "tab:green"}
 for v, lst in runs.items():
     for _, s in lst:
         plt.plot(xs, s["curve"], color=colors.get(v), alpha=0.25, lw=1)

@@ -4,10 +4,11 @@ import torch
 from stable_baselines3 import PPO
 from mario_grid_env import MarioGridEnv
 from mario_kin_env import MarioKinEnv
+from mario_env import MarioEnv
 
 variant, path = sys.argv[1], sys.argv[2]
 n_eps = int(sys.argv[3]) if len(sys.argv) > 3 else 20
-ENV = {"grid": MarioGridEnv, "kin": MarioKinEnv}[variant]
+ENV = {"grid": MarioGridEnv, "kin": MarioKinEnv, "pix": MarioEnv}[variant]
 torch.manual_seed(0)                       # fixed seed so the eval itself is repeatable
 model = PPO.load(path, device="cpu")
 env = ENV()
