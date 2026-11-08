@@ -10,7 +10,7 @@ class MarioGridEnv(MarioEnv):
         super().__init__(level)
         self.observation_space = spaces.Box(-1.0, 2.0, (ROWS * COLS * STACK,), np.float32)
 
-    def _gray84(self, frame):
+    def _encode(self, frame):
         # override: ignore the pixels, read the NES RAM and build a tile grid instead
         ram = self.inner.unwrapped.ram
         tiles = ram[0x500:0x6A0].reshape(2, 13, 16)       # 2 pages x 13 rows x 16 columns

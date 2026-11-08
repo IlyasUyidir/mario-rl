@@ -30,7 +30,7 @@ class MarioEnv(gym.Env):
         return obs.copy(), done, info
 
     @staticmethod
-    def _gray84(frame):
+    def _encode(frame):
         gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         return cv2.resize(gray, (84, 84), interpolation=cv2.INTER_AREA)
 
@@ -41,7 +41,7 @@ class MarioEnv(gym.Env):
         super().reset(seed=seed)
         self.inner.reset()
         obs, _, info = self._inner_step(0)     # NOOP: gives us the starting info
-        first = self._gray84(obs)
+        first = self._encode(obs)
         self.frames.clear()
         for _ in range(STACK):
             self.frames.append(first)          # at reset, all 4 slots hold the same frame
@@ -57,7 +57,7 @@ class MarioEnv(gym.Env):
             if done:
                 break
         frame = np.max(np.stack(recent), axis=0)   # max of last 2 frames kills flicker
-        self.frames.append(self._gray84(frame))
+        self.frames.append(self._encode(frame))
 
         x = info["x_pos"]
         dx = float(np.clip(x - self.last_x, -15, 15))

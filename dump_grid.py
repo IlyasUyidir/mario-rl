@@ -12,7 +12,7 @@ for t in range(n):                                # the Stage 0 "run right + jum
     if done or trunc:
         break
 obs, _, info = env._inner_step(0)                 # one NOOP frame: also grabs the raw screen
-grid = env._gray84(obs)
+grid = env._encode(obs)
 cv2.imwrite("frame.png", cv2.cvtColor(obs, cv2.COLOR_RGB2BGR))
 print("x_pos:", info["x_pos"], "y_pos:", info["y_pos"])
 for row in grid:
