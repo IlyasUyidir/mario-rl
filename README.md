@@ -40,7 +40,7 @@ Baselines (furthest x reached): random 570, scripted run-right-and-jump 695. The
 | grid | 3 | 1392 +/- 297 | 1% +/- 1 | 1513 s |
 | kin | 3 | 1747 +/- 233 | 10% +/- 7 | 1519 s |
 
-"final max x" is the mean furthest x over the last 10% of training episodes (includes exploration).
+"final max x" is the mean furthest x over the last 10% of training episodes (the network is still changing during that window).
 results/eval_1000k.csv holds a separate 50-episode evaluation of every final model. See curves.png.
 
 ## Limitations
