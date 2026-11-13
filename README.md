@@ -24,11 +24,11 @@ rendering during training.
 
 ## Reproduce
 
-    python smoke_test.py                 # the game runs
-    python baselines.py                  # random and scripted baselines
-    python train_mlp.py 0 1000000 kin    # seed 0, 1M steps, variant grid | kin | pix
-    python eval_all.py                   # sampled evaluation of all saved models
-    python report.py                     # tables and curves.png from runs/
+    python -m checks.smoke_test                 # the game runs
+    python -m checks.baselines                  # random and scripted baselines
+    python -m train.train_mlp 0 1000000 kin    # seed 0, 1M steps, variant grid | kin | pix
+    python -m evaluation.eval_all                   # sampled evaluation of all saved models
+    python -m analysis.report                     # tables and curves.png from runs/
 
 ## Results (1M training steps)
 
@@ -41,7 +41,7 @@ Baselines (furthest x reached): random 570, scripted run-right-and-jump 695. The
 | kin | 3 | 1747 +/- 233 | 10% +/- 7 | 1519 s |
 
 "final max x" is the mean furthest x over the last 10% of training episodes (the network is still changing during that window).
-results/eval_1000k.csv holds a separate 50-episode evaluation of every final model. See curves.png.
+results/eval_1000k.csv holds a separate 50-episode evaluation of every final model. See docs/figures/curves.png.
 
 ## Limitations
 
