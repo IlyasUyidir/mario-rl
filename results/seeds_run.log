@@ -1,0 +1,84 @@
+100000 samples: 81417 train / 18583 validation (122 validation episodes)
+grid class weights (enemy, empty, solid, mario): [12.2  1.   2.  10.6]
+epoch 1/15  loss 1.570  val button acc 0.550  val grid acc 0.914  (18s)
+epoch 2/15  loss 1.240  val button acc 0.661  val grid acc 0.939  (17s)
+epoch 3/15  loss 1.119  val button acc 0.724  val grid acc 0.950  (17s)
+epoch 4/15  loss 1.042  val button acc 0.757  val grid acc 0.956  (17s)
+epoch 5/15  loss 0.989  val button acc 0.771  val grid acc 0.960  (17s)
+epoch 6/15  loss 0.951  val button acc 0.784  val grid acc 0.962  (17s)
+epoch 7/15  loss 0.925  val button acc 0.791  val grid acc 0.964  (17s)
+epoch 8/15  loss 0.904  val button acc 0.787  val grid acc 0.966  (17s)
+epoch 9/15  loss 0.887  val button acc 0.816  val grid acc 0.968  (17s)
+epoch 10/15  loss 0.872  val button acc 0.810  val grid acc 0.971  (17s)
+epoch 11/15  loss 0.858  val button acc 0.834  val grid acc 0.971  (17s)
+epoch 12/15  loss 0.845  val button acc 0.820  val grid acc 0.972  (17s)
+epoch 13/15  loss 0.834  val button acc 0.841  val grid acc 0.974  (17s)
+epoch 14/15  loss 0.824  val button acc 0.844  val grid acc 0.974  (17s)
+epoch 15/15  loss 0.813  val button acc 0.837  val grid acc 0.975  (17s)
+
+BUTTONS (teacher's most likely button): accuracy 0.837  (majority baseline 0.408)
+  class      precision  recall     F1  support
+  right+A         0.86    0.81   0.83     5608
+  right+B         0.79    0.91   0.84     4783
+  r+A+B           0.87    0.85   0.86     7589
+  A               0.60    0.37   0.46      603
+
+TILE GRID (cells): accuracy 0.975  (majority baseline 0.786)
+  class      precision  recall     F1  support
+  enemy           0.50    0.96   0.66    13578
+  empty           0.99    0.97   0.98  2087660
+  solid           0.95    0.98   0.97   537671
+  mario           0.53    0.94   0.68    18460
+round 0: 100000 samples, success 16/50, max_x mean 2219 median 2246
+  trained 8 epochs on 140000 samples
+round 1: 140000 samples, success 30/50, max_x mean 2667 median 3161
+  (round 1 took 456s)
+  trained 8 epochs on 180000 samples
+round 2: 180000 samples, success 39/50, max_x mean 2863 median 3161
+  (round 2 took 509s)
+  trained 8 epochs on 220000 samples
+round 3: 220000 samples, success 39/50, max_x mean 2861 median 3161
+  (round 3 took 563s)
+dagger_s1_r3 [sample]: success 164/200  max_x mean 2896  median 3161  best 3161  latency 0.37 ms/decision (cpu)
+100000 samples: 81417 train / 18583 validation (122 validation episodes)
+grid class weights (enemy, empty, solid, mario): [12.2  1.   2.  10.6]
+epoch 1/15  loss 1.520  val button acc 0.590  val grid acc 0.925  (17s)
+epoch 2/15  loss 1.191  val button acc 0.635  val grid acc 0.944  (17s)
+epoch 3/15  loss 1.060  val button acc 0.737  val grid acc 0.952  (17s)
+epoch 4/15  loss 0.986  val button acc 0.757  val grid acc 0.958  (17s)
+epoch 5/15  loss 0.946  val button acc 0.798  val grid acc 0.963  (17s)
+epoch 6/15  loss 0.915  val button acc 0.796  val grid acc 0.966  (17s)
+epoch 7/15  loss 0.894  val button acc 0.814  val grid acc 0.968  (17s)
+epoch 8/15  loss 0.874  val button acc 0.809  val grid acc 0.968  (17s)
+epoch 9/15  loss 0.859  val button acc 0.822  val grid acc 0.971  (17s)
+epoch 10/15  loss 0.843  val button acc 0.844  val grid acc 0.972  (17s)
+epoch 11/15  loss 0.831  val button acc 0.840  val grid acc 0.972  (17s)
+epoch 12/15  loss 0.821  val button acc 0.846  val grid acc 0.974  (17s)
+epoch 13/15  loss 0.811  val button acc 0.851  val grid acc 0.975  (17s)
+epoch 14/15  loss 0.800  val button acc 0.859  val grid acc 0.976  (17s)
+epoch 15/15  loss 0.791  val button acc 0.861  val grid acc 0.977  (17s)
+
+BUTTONS (teacher's most likely button): accuracy 0.861  (majority baseline 0.408)
+  class      precision  recall     F1  support
+  right+A         0.86    0.86   0.86     5608
+  right+B         0.88    0.86   0.87     4783
+  r+A+B           0.86    0.90   0.88     7589
+  A               0.69    0.43   0.53      603
+
+TILE GRID (cells): accuracy 0.977  (majority baseline 0.786)
+  class      precision  recall     F1  support
+  enemy           0.51    0.97   0.67    13578
+  empty           0.99    0.98   0.99  2087660
+  solid           0.96    0.98   0.97   537671
+  mario           0.58    0.95   0.72    18460
+round 0: 100000 samples, success 24/50, max_x mean 2484 median 2674
+  trained 8 epochs on 140000 samples
+round 1: 140000 samples, success 36/50, max_x mean 2750 median 3161
+  (round 1 took 449s)
+  trained 8 epochs on 180000 samples
+round 2: 180000 samples, success 39/50, max_x mean 2904 median 3161
+  (round 2 took 505s)
+  trained 8 epochs on 220000 samples
+round 3: 220000 samples, success 42/50, max_x mean 2937 median 3161
+  (round 3 took 563s)
+dagger_s2_r3 [sample]: success 153/200  max_x mean 2820  median 3161  best 3161  latency 0.37 ms/decision (cpu)

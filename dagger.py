@@ -11,9 +11,10 @@ BASE, TEACHER, INIT, NAME = sys.argv[1:5]
 ROUNDS = int(sys.argv[5]) if len(sys.argv) > 5 else 3
 N_NEW = int(sys.argv[6]) if len(sys.argv) > 6 else 40000
 EPOCHS = int(sys.argv[7]) if len(sys.argv) > 7 else 8
+SEED = int(sys.argv[8]) if len(sys.argv) > 8 else 0
 DEV, BATCH = "mps", 128
-torch.manual_seed(0)
-rng = np.random.default_rng(0)
+torch.manual_seed(SEED)
+rng = np.random.default_rng(SEED)
 
 class CollectEnv(MarioKinEnv):
     def _encode(self, frame):
