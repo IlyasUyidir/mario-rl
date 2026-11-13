@@ -1,0 +1,22 @@
+pix_seed0      finish   0.0%  max_x mean   739  latency 0.50 ms
+grid_seed0     finish   3.0%  max_x mean  1220  latency 0.12 ms
+grid_seed1     finish   5.0%  max_x mean  1562  latency 0.12 ms
+grid_seed2     finish   0.0%  max_x mean  1582  latency 0.12 ms
+kin_seed0      finish   6.0%  max_x mean  1751  latency 0.12 ms
+kin_seed1      finish   6.0%  max_x mean  1359  latency 0.12 ms
+kin_seed2      finish  30.0%  max_x mean  2131  latency 0.11 ms
+kin_seed2_3M   finish  90.0%  max_x mean  3012  latency 0.11 ms
+student_v1     finish  36.0%  max_x mean  2248  latency 0.38 ms
+student_s1     finish  27.0%  max_x mean  2066  latency 0.36 ms
+student_s2     finish  53.0%  max_x mean  2530  latency 0.38 ms
+dagger_v1      finish  77.0%  max_x mean  2899  latency 0.37 ms
+dagger_s1      finish  82.0%  max_x mean  2942  latency 0.38 ms
+dagger_s2      finish  81.0%  max_x mean  2876  latency 0.37 ms
+
+100 sampled episodes per model; mean +/- sd across seeds
+  pixel PPO, 1M steps            n=1  finish   0.0 +/- 0.0 %   max_x   739 +/- 0   latency 0.50 ms
+  grid PPO, 1M steps             n=3  finish   2.7 +/- 2.5 %   max_x  1455 +/- 204   latency 0.12 ms
+  kin PPO, 1M steps              n=3  finish  14.0 +/- 13.9 %   max_x  1747 +/- 386   latency 0.12 ms
+  kin PPO, 3M steps (teacher)    n=1  finish  90.0 +/- 0.0 %   max_x  3012 +/- 0   latency 0.11 ms
+  CNN student, plain imitation   n=3  finish  38.7 +/- 13.2 %   max_x  2282 +/- 234   latency 0.37 ms
+  CNN student + DAgger           n=3  finish  80.0 +/- 2.6 %   max_x  2906 +/- 34   latency 0.37 ms
