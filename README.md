@@ -1,20 +1,87 @@
 # Learning to Play Super Mario Bros with CNN-Based Reinforcement Learning
 # Apprentissage par renforcement avec CNN pour jouer à Super Mario Bros
 
-School project, Deep Learning (5IIR-DDSI). A PPO agent learns World 1-1 of Super Mario Bros by
-trial and error. The algorithm and its settings stay fixed; only what the network sees changes.
+School project, Deep Learning (5IIR-DDSI), adapted from subject 21: a CNN turns screen frames
+(instead of camera gestures) into game commands. Everything is on World 1-1 of Super Mario Bros,
+trained and evaluated on an 8 GB MacBook (Apple M1).
 
-## Variants
+**Question:** can a CNN learn to play Mario from pixels alone on a small laptop?
 
-| name | input to the network | size |
-|---|---|---|
-| pix | 4 stacked 84x84 grayscale frames (CNN policy) | 28,224 |
-| grid | 13x11 tile map read from the game RAM, 4 stacked | 572 |
-| kin | grid + exact position inside the tile + x and y speed | 576 |
+**Answer in short:**
+- Reinforcement learning (PPO) on pixels from scratch: no. 0 of 100 episodes finish the level after 1M steps.
+- PPO on the game's own memory (a tile map plus position and speed): yes. With 3M steps it finishes 90 of 100.
+- A CNN that sees only pixels, trained to imitate that agent and corrected with DAgger: it finishes
+  **80.0 +/- 2.6 %** of episodes (3 seeds), about 0.37 ms per decision on a CPU.
 
-Shared design: each action is held for 4 frames (frame skip). Reward per step = pixels moved right
-- 0.1, -15 on death, +50 at the flag. Episodes are cut after 250 steps without progress. No
-rendering during training.
+## Results
+
+100 sampled episodes per model, one evaluation script for every row (evaluation/eval_final.py).
+Finish rate = share of episodes that reach the flag (x = 3161). "+/-" is the spread across seeds.
+
+| model | what it sees | seeds | finish rate | mean max x | latency (CPU) |
+|---|---|---|---|---|---|
+| random / scripted baselines | - | - | 0% | 570 / 695 | - |
+| pixel PPO, 1M steps | 4 gray frames | 1 | 0.0% | 739 | 0.50 ms |
+| grid PPO, 1M steps | tile map from game memory | 3 | 2.7 +/- 2.5% | 1455 +/- 204 | 0.12 ms |
+| kin PPO, 1M steps | tile map + exact position and speed | 3 | 14.0 +/- 13.9% | 1747 +/- 386 | 0.12 ms |
+| kin PPO, 3M steps (the teacher) | tile map + position and speed | 1 | 90.0% | 3012 | 0.11 ms |
+| CNN student, plain imitation | 4 gray frames | 3 | 38.7 +/- 13.2% | 2282 +/- 234 | 0.37 ms |
+| **CNN student + DAgger** | **4 gray frames** | 3 | **80.0 +/- 2.6%** | **2906 +/- 34** | **0.37 ms** |
+
+![finish rate](docs/figures/fig_finish_rate.png)
+![distance reached](docs/figures/fig_distance.png)
+
+DAgger roughly doubles the finish rate and makes the seeds much more consistent:
+
+![DAgger by round](docs/figures/fig_dagger_rounds.png)
+
+Compute (approximate; the students include the 3M-step teacher):
+
+![cost versus finish rate](docs/figures/fig_cost_vs_finish.png)
+
+## Method
+
+- **Environment** (mario_env.py): gym-super-mario-bros through a wrapper. Each decision lasts 4 frames
+  (frame skip), the last 4 observations are stacked, no rendering during training. Reward per decision =
+  pixels moved right - 0.1, -15 on death, +50 at the flag; episodes are cut after 250 decisions without
+  progress.
+- **Three views of the game:** pix (4 gray 84x84 frames), grid (13x11 tile map read from the game memory),
+  kin (grid + exact position inside the tile + x and y speed). Same PPO settings for all three.
+- **Teacher:** PPO on the kin view, 3M steps (about 76 minutes).
+- **Student** (student.py): the default pixel CNN (3 convolution layers + a 512-unit layer) with two heads: the
+  button (trained on the teacher's probabilities) and an auxiliary task predicting the tile map.
+- **DAgger** (train/dagger.py): the student plays, the teacher labels every state the student reaches, the
+  data is aggregated and the student retrained. 3 rounds of 40,000 states.
+- **Important:** the teacher reads the game's memory (privileged information). At play time the student
+  uses pixels only.
+
+## What the student does with its input
+
+- Per-class precision, recall and F1 and the confusion matrices (held-out episodes, plain-imitation students):
+
+![student metrics](docs/figures/fig_student_metrics.png)
+
+- Grad-CAM and input-gradient saliency (coarse: the last convolution layer is 7x7), and the learned first-layer filters:
+
+![Grad-CAM](docs/figures/fig_gradcam.png)
+![filters](docs/figures/fig_filters.png)
+
+- **HUD test:** blanking the score/coins/timer rows changed the finish rate of the three DAgger students by
+  +4, -4 and -5 points (80.0% to 78.3% on average), within the noise of 100 episodes, and the HUD rows get
+  1.9% of the input-gradient saliency (they cover 13.1% of the image rows). No evidence that the CNN uses the HUD.
+
+Demo videos (the game on the left, the CNN's button probabilities on the right) are in docs/.
+
+## Limitations
+
+- One level (World 1-1) in a deterministic emulator. No claim about other levels; the student may use
+  scenery as a location cue (only the HUD was tested).
+- One teacher; the 3 student seeds vary the student only. The pixel PPO baseline is 1 seed, 1M steps, and its
+  settings were not tuned; a pixel PPO with a larger budget was not tried.
+- The student keeps about 89% of the teacher's finish rate (80.0% vs 90%); the remaining gap is real but small.
+- Evaluation samples actions from each model (the emulator is deterministic, so greedy play would repeat one
+  episode). With 100 episodes a single model's finish rate has about +/- 4 points of noise.
+- Compute figures are partly estimated from timings.
 
 ## Setup
 
@@ -22,49 +89,25 @@ rendering during training.
     source .venv/bin/activate
     pip install -r requirements.txt
 
-## Reproduce
+## Reproduce (run from the repository root)
 
-    python -m checks.smoke_test                 # the game runs
-    python -m checks.baselines                  # random and scripted baselines
-    python -m train.train_mlp 0 1000000 kin    # seed 0, 1M steps, variant grid | kin | pix
-    python -m evaluation.eval_all                   # sampled evaluation of all saved models
-    python -m analysis.report                     # tables and curves.png from runs/
+    python -m checks.smoke_test
+    python -m checks.baselines
+    python -m train.train_mlp 2 3000000 kin            # teacher: seed 2, 3M steps, variant grid | kin | pix
+    python -m train.collect 100000 models/kin_seed2_3000k data/kin3m_100k.npz
+    python -m train.train_student data/kin3m_100k.npz student_v1 15 1.0 0
+    python -m train.dagger data/kin3m_100k.npz models/kin_seed2_3000k models/student_v1.pt dagger_v1 3 40000 8 0
+    python -m evaluation.eval_final 100                # all models, one protocol
+    python -m analysis.make_figures
+    python -m analysis.gradcam models/dagger_v1_r3.pt
+    python -m evaluation.play_video models/dagger_v1_r3.pt greedy docs/demo.mp4
 
-## Results (1M training steps)
+## Repository layout
 
-Baselines (furthest x reached): random 570, scripted run-right-and-jump 695. The flag is near x = 3161.
-
-| variant | seeds | final max x | finish rate (last 10%) | wall-clock |
-|---|---|---|---|---|
-| pix | 1 | 730 | 0% | 3204 s |
-| grid | 3 | 1392 +/- 297 | 1% +/- 1 | 1513 s |
-| kin | 3 | 1747 +/- 233 | 10% +/- 7 | 1519 s |
-
-"final max x" is the mean furthest x over the last 10% of training episodes (the network is still changing during that window).
-results/eval_1000k.csv holds a separate 50-episode evaluation of every final model. See docs/figures/curves.png.
-
-## Limitations
-
-- 3 seeds per variant (1 for pix): the spreads are rough, not significance tests.
-- PPO settings are shared across variants and were not tuned for pixels.
-- One level (1-1) only, and all curves are still rising at 1M steps.
-
-## Files
-
-- mario_env.py, mario_grid_env.py, mario_kin_env.py: the three environments (pix, grid, kin)
-- train_mlp.py, eval_all.py, eval_mlp.py: training and evaluation
-- summarize.py, curve.py, where_die.py, report.py: analysis of the runs/ logs
-- test_env.py, dump_grid.py, check_kin.py, bench_device.py: sanity checks and benchmarks
-
-## Evaluation of the final models
-
-50 sampled episodes per model (CPU, batch 1). Median max x is the mean +/- sd across seeds of each model's median.
-
-| variant | seeds | episodes reaching the flag | median max x | latency per decision |
-|---|---|---|---|---|
-| pix | 1 | 0/50 | 714 | 0.44 ms |
-| grid | 3 | 3/150 | 1332 +/- 178 | 0.11 ms |
-| kin | 3 | 19/150 | 1728 +/- 281 | 0.11 ms |
-
-Flags per seed in 50 episodes: grid 0 / 3 / 0, kin 3 / 5 / 11. The ranges overlap, so with 3 seeds
-"kin finishes more often" is a trend, not a proven difference.
+- mario_env.py, mario_grid_env.py, mario_kin_env.py, student.py: shared code (environments and the CNN)
+- train/: PPO training, data collection, student training, DAgger
+- evaluation/: evaluation of all models, in-game play, demo video, HUD test
+- analysis/: learning curves, death positions, figures, Grad-CAM
+- checks/: sanity checks and benchmarks (smoke test, baselines, CPU vs GPU, gradient-descent toy)
+- results/: per-episode evaluation data and logs; runs/: training logs; docs/: figures and videos
+- models/: final PPO models and the three DAgger students (data/ is regenerated, not stored)
